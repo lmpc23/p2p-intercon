@@ -36,4 +36,11 @@ public class Aplicacion implements IAplicacion{
         return ruta;
     }
 
+
+    @Override
+    public String toString()
+    {
+        return nombre;
+    }
+
 }

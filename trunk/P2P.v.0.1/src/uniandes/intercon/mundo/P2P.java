@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import uniandes.intercon.interfaz.InterfazP2P;
 
 /**
  * 
@@ -14,8 +15,9 @@ import java.util.logging.Logger;
  * @author Juan Pablo
  *
  */
-public class P2P {
-
+public class P2P
+{
+    private InterfazP2P interfaz;
     private String login;
     private String ip;
     private ArrayList<IClienteRemoto> listaClientesDisponibles;
@@ -23,9 +25,10 @@ public class P2P {
     ThreadServidorUDP ts;
     ThreadClienteUDP tc;
 
-    public P2P(String nlog) {
-
+    public P2P(String nlog, InterfazP2P gui)
+    {
         login = nlog;
+        interfaz = gui;
         try {
             ip = InetAddress.getLocalHost().getHostAddress().toString();
             listaClientesDisponibles = new ArrayList<IClienteRemoto>();
@@ -74,6 +77,7 @@ public class P2P {
             IClienteRemoto c = listaClientesDisponibles.get(i);
             if (c.darNickname().equals(login) && c.darIP().equals(ip)) {
                 c.darListaAplicaciones().remove(nombreA);
+                interfaz.publicarNoticia(login+" ha dado de baja la aplicación: "+nombreA);
             }
         }
     }
@@ -83,6 +87,8 @@ public class P2P {
             IClienteRemoto c = listaClientesDisponibles.get(i);
             if (c.darNickname().equals(login) && c.darIP().equals(ip)) {
                 c.darListaAplicaciones().add(nombreA);
+                interfaz.publicarNoticia(login+" ha agregado una nueva aplicación: "+nombreA);
+
             }
         }
     }
@@ -91,6 +97,7 @@ public class P2P {
         for (int i = 0; i < listaClientesDisponibles.size(); i++) {
             IClienteRemoto c = listaClientesDisponibles.get(i);
             listaClientesDisponibles.remove(c);
+            interfaz.publicarNoticia(login+" se ha desconectado.");
         }
     }
 
@@ -151,14 +158,34 @@ public class P2P {
         return valor;
     }
 
-    /**
+    public int numApps() {
+        return listaAplicacionesLocales.size();
+    }
+
+    public int busquedaLocal(String appname) throws Exception {
+        for (int i = 0; i < listaAplicacionesLocales.size(); i++) {
+            IAplicacion temp = listaAplicacionesLocales.get(i);
+            if (temp.darNombre().equals(appname)) {
+                return i;
+            }
+        }
+
+        throw new Exception("La aplicación buscada, no se encuentra localmente");
+    }
+
+    public ArrayList getListaLocal()
+    {
+        return listaAplicacionesLocales;
+    }
+
+    /*
      * @param args
-     */
+     
     public static void main(String[] args) throws IOException {
         P2P p = new P2P("usuario");
 
     }
-    //Test
+    //Test*/
 }
 
 
