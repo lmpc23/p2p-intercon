@@ -10,32 +10,33 @@
  */
 package uniandes.intercon.interfaz;
 
-import java.util.ArrayList;
 import java.util.Date;
-import javax.swing.DefaultListModel;
+import java.util.Observable;
+import java.util.Observer;
 import javax.swing.ImageIcon;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.ListModel;
-import uniandes.intercon.mundo.IAplicacion;
+import uniandes.intercon.mundo.Noticia;
 import uniandes.intercon.mundo.P2P;
 
 /**
  *
  * @author Julian
  */
-public class InterfazP2P extends javax.swing.JFrame {
+public class InterfazP2P extends javax.swing.JFrame implements Observer
+{
 
     private P2P mundo;
+    private Noticia noticia;
 
     /** Creates new form InterfazP2P */
     public InterfazP2P() {
         boolean logged = false;
         while (!logged) {
             String login = JOptionPane.showInputDialog(this, "Ingrese su login", "Login", JOptionPane.INFORMATION_MESSAGE);
-            if (login != null && !login.equals("")) {
-
-                mundo = new P2P(login, this);
+            if (login != null && !login.equals(""))
+            {
+                noticia = new Noticia();
+                mundo = new P2P(login, noticia);
                 if (mundo.numApps() == 0) {
                     int step1 = JOptionPane.showConfirmDialog(this, "¿Desea añadir aplicaciones para compartir?");
                     if (step1 == JOptionPane.YES_OPTION) {
@@ -51,8 +52,11 @@ public class InterfazP2P extends javax.swing.JFrame {
                         }
                     }
                 }
-
+                
                 initComponents();
+                noticia.addObserver(this);
+                
+                
                 logged = true;
             } else {
                 JOptionPane.showMessageDialog(this, "Por favor ingrese un login válido", "Error", JOptionPane.ERROR_MESSAGE);
@@ -77,7 +81,7 @@ public class InterfazP2P extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList3 = jList3 = new javax.swing.JList(mundo.getListaLocal().toArray());
+        jList3 = new javax.swing.JList();
         jPanel5 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList();
@@ -87,11 +91,12 @@ public class InterfazP2P extends javax.swing.JFrame {
         jButton5 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
+        jPanel3 = new PanelNoticias(noticia);
         jScrollPane4 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(204, 204, 204));
 
@@ -133,7 +138,7 @@ public class InterfazP2P extends javax.swing.JFrame {
                     .add(jButton1, 0, 0, Short.MAX_VALUE)
                     .add(jButton3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(jButton2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -192,8 +197,8 @@ public class InterfazP2P extends javax.swing.JFrame {
                 .add(jScrollPane3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 262, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jButton5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
-                    .add(jButton4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE))
+                    .add(jButton5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
+                    .add(jButton4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -219,14 +224,14 @@ public class InterfazP2P extends javax.swing.JFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 805, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 801, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jTabbedPane1)
         );
 
-        jPanel2.setBackground(new java.awt.Color(255, 102, 102));
+        jPanel2.setBackground(new java.awt.Color(204, 204, 204));
 
         jLabel1.setIcon(new ImageIcon("./data/logo1.png"));
         jLabel1.setText("LOGO");
@@ -247,6 +252,7 @@ public class InterfazP2P extends javax.swing.JFrame {
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Noticias"));
 
         jTextArea1.setColumns(20);
+        jTextArea1.setEditable(false);
         jTextArea1.setRows(5);
         jScrollPane4.setViewportView(jTextArea1);
 
@@ -254,20 +260,23 @@ public class InterfazP2P extends javax.swing.JFrame {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 791, Short.MAX_VALUE)
+            .add(jPanel3Layout.createSequentialGroup()
+                .add(jScrollPane4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 783, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE)
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1, 0, 803, Short.MAX_VALUE)
-            .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(jPanel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel3, 0, 801, Short.MAX_VALUE)
+                .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -286,7 +295,7 @@ public class InterfazP2P extends javax.swing.JFrame {
         // Bóton: Agregar una nueva aplicación
         agregarApp();
         jList3.setListData(mundo.getListaLocal().toArray());
-        
+
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -314,10 +323,9 @@ public class InterfazP2P extends javax.swing.JFrame {
         String appname = JOptionPane.showInputDialog(this, "Nombre de la aplicación", "Ingrese el nombre de la aplicación a agregar", JOptionPane.INFORMATION_MESSAGE);
         String apppath = JOptionPane.showInputDialog(this, "Ruta local de la aplicación", "Ingrese la ruta donde se encuentra la aplicación", JOptionPane.INFORMATION_MESSAGE);
         if (appname != null && !appname.equals("") && apppath != null && !apppath.equals("")) {
-            try
-            {
+            try {
                 mundo.agregarAplicacion(appname, apppath);
-                
+
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Error agregando la aplicación", "Error", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
@@ -341,17 +349,13 @@ public class InterfazP2P extends javax.swing.JFrame {
         }
     }
 
-    private void buscarApp()
-    {
+    private void buscarApp() {
         String appname = JOptionPane.showInputDialog(this, "Nombre de la aplicación", "Ingrese el nombre de la aplicación a buscar", JOptionPane.INFORMATION_MESSAGE);
         if (appname != null && !appname.equals("")) {
-            try
-            {
+            try {
                 int indice = mundo.busquedaLocal(appname);
                 jList3.setSelectedIndex(indice);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         } else {
@@ -360,12 +364,14 @@ public class InterfazP2P extends javax.swing.JFrame {
 
     }
 
-    public void publicarNoticia(String noticia)
+    public void update(Observable o, Object arg)
     {
+        System.out.println("AQUI LLEGO");
+        String news = ( String )arg;
         Date hoy = new Date(System.currentTimeMillis());
-        if (jTextArea1 != null)
-            jTextArea1.setText("["+hoy.toString()+"] "+ noticia +"\n"+jTextArea1.getText());
-        
+        jTextArea1.setText( "["+hoy.toString()+"] "+ news +"\n"+jTextArea1.getText() );
+    }
+    public void publicarNoticia(String noticia) {
     }
 
     /**
@@ -401,4 +407,6 @@ public class InterfazP2P extends javax.swing.JFrame {
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
+
+
 }
