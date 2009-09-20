@@ -13,6 +13,8 @@ package uniandes.intercon.interfaz;
 import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import uniandes.intercon.mundo.Noticia;
@@ -55,6 +57,8 @@ public class InterfazP2P extends javax.swing.JFrame implements Observer
                 
                 initComponents();
                 noticia.addObserver(this);
+                jList1.setListData(mundo.getListaRemota().toArray());
+                
                 
                 
                 logged = true;
@@ -91,7 +95,7 @@ public class InterfazP2P extends javax.swing.JFrame implements Observer
         jButton5 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jPanel3 = new PanelNoticias(noticia);
+        jPanel3 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
 
@@ -158,18 +162,15 @@ public class InterfazP2P extends javax.swing.JFrame implements Observer
 
         jTabbedPane1.addTab("Mis Aplicaciones", jPanel4);
 
-        jList1.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
+        jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jList1.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList1ValueChanged(evt);
+            }
         });
         jScrollPane2.setViewportView(jList1);
 
-        jList2.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
+        jList2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane3.setViewportView(jList2);
 
         jButton4.setText("Utilizar Aplicación");
@@ -319,6 +320,20 @@ public class InterfazP2P extends javax.swing.JFrame implements Observer
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton5ActionPerformed
 
+    private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
+        String ur1 = (String) jList1.getSelectedValue().toString();
+        System.out.println(ur1);
+        try
+        {
+            String ur2 = ur1.substring(0,ur1.lastIndexOf(":"));
+            jList2.setListData(mundo.getListaArchivosURemoto(ur2).toArray());
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_jList1ValueChanged
+
     private void agregarApp() {
         String appname = JOptionPane.showInputDialog(this, "Nombre de la aplicación", "Ingrese el nombre de la aplicación a agregar", JOptionPane.INFORMATION_MESSAGE);
         String apppath = JOptionPane.showInputDialog(this, "Ruta local de la aplicación", "Ingrese la ruta donde se encuentra la aplicación", JOptionPane.INFORMATION_MESSAGE);
@@ -366,13 +381,18 @@ public class InterfazP2P extends javax.swing.JFrame implements Observer
 
     public void update(Observable o, Object arg)
     {
-        System.out.println("AQUI LLEGO");
         String news = ( String )arg;
+        if(news.startsWith("REMOTO"))
+        {
+            jList1.setListData(mundo.getListaRemota().toArray());
+            
+        }
+        String news2 = news.substring(6);
         Date hoy = new Date(System.currentTimeMillis());
-        jTextArea1.setText( "["+hoy.toString()+"] "+ news +"\n"+jTextArea1.getText() );
+        jTextArea1.setText( "["+hoy.toString()+"] "+ news2 +"\n"+jTextArea1.getText() );
+        
     }
-    public void publicarNoticia(String noticia) {
-    }
+    
 
     /**
      * @param args the command line arguments
