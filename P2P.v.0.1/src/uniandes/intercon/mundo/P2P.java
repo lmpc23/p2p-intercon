@@ -18,7 +18,7 @@ import uniandes.intercon.interfaz.InterfazP2P;
  */
 public class P2P
 {
-    private InterfazP2P interfaz;
+
     private String login;
     private String ip;
     private ArrayList<IClienteRemoto> listaClientesDisponibles;
@@ -31,6 +31,7 @@ public class P2P
      * Thread del Cliente vía UDP
      */
     ThreadClienteUDP tc;
+    private Noticia noticia;
 
 
     /**
@@ -38,11 +39,11 @@ public class P2P
      * @param nlog, login del usuario local
      */
 
-    public P2P(String nlog, InterfazP2P gui)
+    public P2P(String nlog, Noticia nt)
     {
-
+        noticia = nt;
         login = nlog;
-        interfaz = gui;
+       
         try {
             //obtención del localhost
             ip = InetAddress.getLocalHost().getHostAddress().toString();
@@ -111,7 +112,7 @@ public class P2P
             IClienteRemoto c = listaClientesDisponibles.get(i);
             if (c.darNickname().equals(login) && c.darIP().equals(ip)) {
                 c.darListaAplicaciones().remove(nombreA);
-                interfaz.publicarNoticia(login+" ha dado de baja la aplicación: "+nombreA);
+                noticia.setNoticia(login+" ha dado de baja la aplicación: "+nombreA);
             }
         }
     }
@@ -127,7 +128,9 @@ public class P2P
             IClienteRemoto c = listaClientesDisponibles.get(i);
             if (c.darNickname().equals(login) && c.darIP().equals(ip)) {
                 c.darListaAplicaciones().add(nombreA);
-                interfaz.publicarNoticia(login+" ha agregado una nueva aplicación: "+nombreA);
+                //interfaz.publicarNoticia(login+" ha agregado una nueva aplicación: "+nombreA);
+                noticia.setNoticia(login+" ha agregado una nueva aplicación: "+nombreA);
+
 
             }
         }
@@ -142,7 +145,7 @@ public class P2P
         for (int i = 0; i < listaClientesDisponibles.size(); i++) {
             IClienteRemoto c = listaClientesDisponibles.get(i);
             listaClientesDisponibles.remove(c);
-            interfaz.publicarNoticia(login+" se ha desconectado.");
+            noticia.setNoticia(login+" se ha desconectado.");
         }
     }
 
