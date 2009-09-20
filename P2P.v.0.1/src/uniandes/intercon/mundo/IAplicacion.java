@@ -13,9 +13,11 @@ public interface IAplicacion {
 
     public String darNombre();
 
-
     public Object darResultados(String parametros[]);
 
     public String darRuta();
+
+    @Override
+    public String toString();
 
 }
