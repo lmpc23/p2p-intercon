@@ -90,6 +90,7 @@ public class ThreadClienteUDP extends Thread {
         DatagramPacket pack = new DatagramPacket(buf, buf.length,
 		      					 InetAddress.getByName(group), port);
         s.send(pack);
+        s.close();
     }
 
 
