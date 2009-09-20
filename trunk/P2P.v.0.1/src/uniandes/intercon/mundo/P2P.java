@@ -44,124 +44,120 @@ public class P2P {
         }
     }
 
-    public void responderHandshake()
-    {
+    public void responderHandshake() {
         try {
             tc.handshakingAns(login, ip, listaAplicacionesLocales);
-            
-        } catch (Exception ex) {
 
+        } catch (Exception ex) {
         }
     }
 
-    public void agregarClienteRemoto(IClienteRemoto cr)
-    {
-        if(!comprobarRegistro(cr))
+    public void agregarClienteRemoto(IClienteRemoto cr) {
+        if (!comprobarRegistro(cr)) {
             listaClientesDisponibles.add(cr);
+        }
 
     }
 
-  
-      private boolean comprobarRegistro(IClienteRemoto cr) {
-        for(int i=0; i<listaClientesDisponibles.size(); i++)
-        {
-            if(listaClientesDisponibles.get(i).toString().equals(cr.toString()))
+    private boolean comprobarRegistro(IClienteRemoto cr) {
+        for (int i = 0; i < listaClientesDisponibles.size(); i++) {
+            if (listaClientesDisponibles.get(i).toString().equals(cr.toString())) {
                 return true;
+            }
         }
         return false;
     }
 
-      public void eliminarAplicacionRemota(String login, String ip, String nombreA){
+    public void eliminarAplicacionRemota(String login, String ip, String nombreA) {
 
-        for(int i=0; i<listaClientesDisponibles.size(); i++)
-        {
-            IClienteRemoto c=listaClientesDisponibles.get(i);
-            if(c.darNickname().equals(login) && c.darIP().equals(ip))
+        for (int i = 0; i < listaClientesDisponibles.size(); i++) {
+            IClienteRemoto c = listaClientesDisponibles.get(i);
+            if (c.darNickname().equals(login) && c.darIP().equals(ip)) {
                 c.darListaAplicaciones().remove(nombreA);
+            }
         }
-      }
+    }
 
-      public void agregarAplicacionRemota(String login, String ip, String nombreA){
-       for(int i=0; i<listaClientesDisponibles.size(); i++)
-        {
-            IClienteRemoto c=listaClientesDisponibles.get(i);
-            if(c.darNickname().equals(login) && c.darIP().equals(ip))
+    public void agregarAplicacionRemota(String login, String ip, String nombreA) {
+        for (int i = 0; i < listaClientesDisponibles.size(); i++) {
+            IClienteRemoto c = listaClientesDisponibles.get(i);
+            if (c.darNickname().equals(login) && c.darIP().equals(ip)) {
                 c.darListaAplicaciones().add(nombreA);
+            }
         }
-      }
+    }
 
-      public void desconexionUsuarioRemota(String login, String ip){
-             for(int i=0; i<listaClientesDisponibles.size(); i++)
-        {
-            IClienteRemoto c=listaClientesDisponibles.get(i);
+    public void desconexionUsuarioRemota(String login, String ip) {
+        for (int i = 0; i < listaClientesDisponibles.size(); i++) {
+            IClienteRemoto c = listaClientesDisponibles.get(i);
             listaClientesDisponibles.remove(c);
         }
-      }
+    }
 
-      public void agregarAplicacion(String ap) throws Exception
-      {
+    public void agregarAplicacion(String ap, String ruta) throws Exception {
         //código nueva Aplicacion
+        listaAplicacionesLocales.add(new Aplicacion(ap, ruta));
         tc.agregarAplicacion(login, ip, ap);
-      }
+    }
 
-      public void eliminarAplicacion(String ap) throws Exception
-      {
-        for(int i=0; i<listaAplicacionesLocales.size(); i++)
-        {
+    public void eliminarAplicacion(String ap) throws Exception {
+        for (int i = 0; i < listaAplicacionesLocales.size(); i++) {
             IAplicacion a = listaAplicacionesLocales.get(i);
-            if(a.darNombre().equals(ap))
-            {
+            if (a.darNombre().equals(ap)) {
                 listaAplicacionesLocales.remove(a);
                 tc.eliminarAplicacion(login, ip, ap);
                 break;
             }
         }
-      }
+    }
 
-      public void desconexion() throws Exception
-      {
+    public void desconexion() throws Exception {
         tc.desconexion(login, ip);
-      }
+    }
+
+    public String ejecutar(String ap, String comando[]) {
+
+        String valor = null;
+
+        for (int i = 0; i < listaAplicacionesLocales.size(); i++) {
+            IAplicacion a = listaAplicacionesLocales.get(i);
+            if (a.equals(ap)) {
+                Runtime r = Runtime.getRuntime();
+                Process pr = null;
+
+                try {
+                    byte b[] = new byte[1024];
+                    int res = 0;
+                    pr = r.exec(comando);
+                    System.out.println(pr.getInputStream().read(b));
+                    valor = new String(b);
+                    for (int j = 0; j < valor.length(); j++) {
+                        if ((int) valor.charAt(j) == 0) {
+                            res = i;
+                            break;
+                        }
+                    }
+
+                    valor = valor.substring(0, res);
+
+
+                } catch (Exception e) {
+                    System.out.println("Error ejecutando " + comando[0]);
+                    System.out.println(e.getMessage());
+                }
+
+            }
+        }
+        return valor;
+    }
 
     /**
      * @param args
      */
     public static void main(String[] args) throws IOException {
         P2P p = new P2P("usuario");
-         Runtime r = Runtime.getRuntime();
-        Process pr = null;
-        String comando[] = { "java","-jar", "J:\\AplicacionDePrueba\\dist\\AplicacionDePrueba.jar"};
-        System.out.println(":::::::::::::::::::::::::");
-     
-        // Intenta ejecutar el comando que se le indica, en
-        // este caso lanzar el bloc de notas
-        try {
-            byte b[] = new byte[1024];
-            int res=0;
-            pr = r.exec( comando );
-            System.out.println(pr.getInputStream().read(b));
-            String valor=new String(b);
-            for(int i=0; i<valor.length(); i++)
-            {
-                if((int)valor.charAt(i)==0)
-                {
-                    res=i;
-                    break;
-                }
-            }
-  
-            valor = valor.substring(0, res);
-            System.out.println(valor);
-
-        } catch( Exception e ) {
-            System.out.println( "Error ejecutando "+comando[0] );
-             System.out.println( e.getMessage() );
-            }
 
     }
-
-
-
     //Test
 }
 

@@ -16,4 +16,6 @@ public interface IAplicacion {
 
     public Object darResultados(String parametros[]);
 
+    public String darRuta();
+
 }
