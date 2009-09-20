@@ -12,6 +12,7 @@ import uniandes.intercon.interfaz.InterfazP2P;
  * 
  */
 /**
+ * Clase Principal del Mundo
  * @author Juan Pablo
  *
  */
@@ -22,24 +23,39 @@ public class P2P
     private String ip;
     private ArrayList<IClienteRemoto> listaClientesDisponibles;
     private ArrayList<IAplicacion> listaAplicacionesLocales;
+    /**
+     * Thread del Servidor vía UDP
+     */
     ThreadServidorUDP ts;
+    /**
+     * Thread del Cliente vía UDP
+     */
     ThreadClienteUDP tc;
+
+
+    /**
+     * Constructor del mundo
+     * @param nlog, login del usuario local
+     */
 
     public P2P(String nlog, InterfazP2P gui)
     {
+
         login = nlog;
         interfaz = gui;
         try {
+            //obtención del localhost
             ip = InetAddress.getLocalHost().getHostAddress().toString();
             listaClientesDisponibles = new ArrayList<IClienteRemoto>();
             listaAplicacionesLocales = new ArrayList<IAplicacion>();
 
+            //inicialización de los Threads UDP cliente y Servidor
             ts = new ThreadServidorUDP(this);
             ts.start();
             tc = new ThreadClienteUDP();
             tc.start();
 
-
+            //Handshaking para la red P2P
             tc.handshaking(login, ip, listaAplicacionesLocales);
 
 
@@ -47,6 +63,9 @@ public class P2P
         }
     }
 
+    /**
+     * Método del mundo para dar Respuesta a todos los usuarios que entren a la red, existe para evitar un ciclo interminable de saludos
+     */
     public void responderHandshake() {
         try {
             tc.handshakingAns(login, ip, listaAplicacionesLocales);
@@ -55,6 +74,10 @@ public class P2P
         }
     }
 
+    /**
+     * Método que agrega a la lista de Clientes Disponibles un cliente, junto con la lista de sus aplicaciones (modelada en el objeto)
+     * @param cr ClienteRemoto a agregar, se comprueba que no exista ya (login e IP no coincidan en alguno de la lista).
+     */
     public void agregarClienteRemoto(IClienteRemoto cr) {
         if (!comprobarRegistro(cr)) {
             listaClientesDisponibles.add(cr);
@@ -62,6 +85,11 @@ public class P2P
 
     }
 
+    /**
+     * Método para comprobar que no haya un cliente registrado de antemano, mirando IP y LOGIN
+     * @param cr Cliente remoto
+     * @return Falso o Verdadero
+     */
     private boolean comprobarRegistro(IClienteRemoto cr) {
         for (int i = 0; i < listaClientesDisponibles.size(); i++) {
             if (listaClientesDisponibles.get(i).toString().equals(cr.toString())) {
@@ -71,6 +99,12 @@ public class P2P
         return false;
     }
 
+    /**
+     * Método que elimina una Aplicacion Remota de un cliente, dados los parámetros del mismo
+     * @param login del cliente con la aplicacion
+     * @param ip del cliente con la aplicación
+     * @param nombreA nombre de la aplicación
+     */
     public void eliminarAplicacionRemota(String login, String ip, String nombreA) {
 
         for (int i = 0; i < listaClientesDisponibles.size(); i++) {
@@ -82,6 +116,12 @@ public class P2P
         }
     }
 
+    /**
+     * Método para agregar, tras una notificación, una aplicación remota de un cliente
+     * @param login del cliente con la aplicación
+     * @param ip  del cliente con la aplicación
+     * @param nombreA nombre de la aplicación
+     */
     public void agregarAplicacionRemota(String login, String ip, String nombreA) {
         for (int i = 0; i < listaClientesDisponibles.size(); i++) {
             IClienteRemoto c = listaClientesDisponibles.get(i);
@@ -93,6 +133,11 @@ public class P2P
         }
     }
 
+    /**
+     * Método que eliminar un usuario de la lista de Clientes disponibles dada su desconexión
+     * @param login
+     * @param ip
+     */
     public void desconexionUsuarioRemota(String login, String ip) {
         for (int i = 0; i < listaClientesDisponibles.size(); i++) {
             IClienteRemoto c = listaClientesDisponibles.get(i);
@@ -101,12 +146,23 @@ public class P2P
         }
     }
 
+    /**
+     * Método que agrega una aplicación a nivel local y lo notifica a los demás usuarios
+     * @param ap
+     * @param ruta
+     * @throws java.lang.Exception
+     */
     public void agregarAplicacion(String ap, String ruta) throws Exception {
         //código nueva Aplicacion
         listaAplicacionesLocales.add(new Aplicacion(ap, ruta));
         tc.agregarAplicacion(login, ip, ap);
     }
 
+    /**
+     * Método que elimina una aplicación a nivel local y lo notifica a los demás usuarios
+     * @param ap
+     * @throws java.lang.Exception
+     */
     public void eliminarAplicacion(String ap) throws Exception {
         for (int i = 0; i < listaAplicacionesLocales.size(); i++) {
             IAplicacion a = listaAplicacionesLocales.get(i);
@@ -118,10 +174,21 @@ public class P2P
         }
     }
 
+
+    /**
+     * Método que notifica la desconexión del usuario
+     * @throws java.lang.Exception
+     */
     public void desconexion() throws Exception {
         tc.desconexion(login, ip);
     }
 
+    /**
+     * Método para ejecutar una aplicación a nivel local y que retorne una respuesta en String
+     * @param ap, la aplicación a ejecutar
+     * @param comando, comando para correr la aplicación, lleva "java, -jar, ruta, parámetros..."
+     * @return Cadena resultado
+     */
     public String ejecutar(String ap, String comando[]) {
 
         String valor = null;
