@@ -82,6 +82,7 @@ public class P2P
     public void agregarClienteRemoto(IClienteRemoto cr) {
         if (!comprobarRegistro(cr)) {
             listaClientesDisponibles.add(cr);
+            noticia.setNoticia("REMOTO"+cr.darNickname()+ " ha iniciado sesión.");
         }
 
     }
@@ -128,7 +129,6 @@ public class P2P
             IClienteRemoto c = listaClientesDisponibles.get(i);
             if (c.darNickname().equals(login) && c.darIP().equals(ip)) {
                 c.darListaAplicaciones().add(nombreA);
-                //interfaz.publicarNoticia(login+" ha agregado una nueva aplicación: "+nombreA);
                 noticia.setNoticia(login+" ha agregado una nueva aplicación: "+nombreA);
 
 
@@ -145,7 +145,7 @@ public class P2P
         for (int i = 0; i < listaClientesDisponibles.size(); i++) {
             IClienteRemoto c = listaClientesDisponibles.get(i);
             listaClientesDisponibles.remove(c);
-            noticia.setNoticia(login+" se ha desconectado.");
+            noticia.setNoticia("REMOTO"+login+" se ha desconectado.");
         }
     }
 
@@ -246,6 +246,26 @@ public class P2P
     public ArrayList getListaLocal()
     {
         return listaAplicacionesLocales;
+    }
+
+    public ArrayList getListaRemota()
+    {
+        return listaClientesDisponibles;
+    }
+
+    public ArrayList getListaArchivosURemoto(String ur) throws Exception
+    {
+        for(int i=0;i<listaClientesDisponibles.size();i++)
+        {
+            IClienteRemoto temp = listaClientesDisponibles.get(i);
+            if(temp.darNickname().equals(ur))
+            {
+                return temp.darListaAplicaciones();
+            }
+        }
+
+        throw new Exception("Error localizando al usuario remoto");
+
     }
 
     /*
