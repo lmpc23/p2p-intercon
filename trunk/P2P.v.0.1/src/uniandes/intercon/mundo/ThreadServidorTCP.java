@@ -6,6 +6,7 @@
 package uniandes.intercon.mundo;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -49,20 +50,22 @@ public class ThreadServidorTCP extends Thread{
         {
             Socket cliente = servidor.accept();
 
-           BufferedReader in = new BufferedReader(new InputStreamReader ( cliente.getInputStream()));
+           //BufferedReader in = new BufferedReader(new DataInputStream(cliente.getInputStream()));
+           DataInputStream dis = new DataInputStream(cliente.getInputStream());
            DataOutputStream out = new DataOutputStream(cliente.getOutputStream());
 
-           String msj = in.readLine();
+           String msj = dis.readUTF();
            String[] val = msj.split(":");
            if(val[0].equals("APLICACION_LIN"))
            {
                 IAplicacion a = principal.darAplicacion(val[1]);
-                out.writeBytes(a.darInstrucciones());
+                System.out.println(val[1]);
+                out.writeUTF(a.darInstrucciones());
            }
            else if(val[0].equals("APLICACION_NUMPAR"))
            {
                 IAplicacion a = principal.darAplicacion(val[1]);
-                out.writeBytes(String.valueOf(a.darNumeroParámetros()));
+                out.writeUTF(String.valueOf(a.darNumeroParámetros()));
            }
            else if(val[0].equals("APLICACION_PARAMS"))
            {
@@ -73,7 +76,7 @@ public class ThreadServidorTCP extends Thread{
                 }
 
                 String res = principal.ejecutar(val[1], params);
-                out.writeBytes(res);
+                out.writeUTF(res);
            }
 
 
