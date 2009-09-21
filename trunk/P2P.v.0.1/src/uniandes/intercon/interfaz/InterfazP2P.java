@@ -69,6 +69,26 @@ public class InterfazP2P extends javax.swing.JFrame implements Observer
 
     }
 
+    private void ejecutar(String ap) {
+        try{
+       String linea=mundo.recibirLineamientos(ap);
+       int nPar = Integer.parseInt(mundo.darNumeroParametros());
+       String[] params = new String[nPar];
+       JOptionPane.showMessageDialog(this, "Instrucciones", linea, JOptionPane.INFORMATION_MESSAGE);
+       for(int i =0; i < params.length; i++)
+       {
+            params[i]=JOptionPane.showInputDialog(this, "Entradas", "Ingrese Parámetro "+i, JOptionPane.INFORMATION_MESSAGE);
+       }
+       String res = mundo.darResultados(params);
+       JOptionPane.showMessageDialog(this, "Resultado", res, JOptionPane.INFORMATION_MESSAGE);
+
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -313,7 +333,9 @@ public class InterfazP2P extends javax.swing.JFrame implements Observer
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
+        String ap = (String) jList2.getSelectedValue().toString();
+        System.out.println(ap);
+        ejecutar(ap);
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
@@ -337,9 +359,12 @@ public class InterfazP2P extends javax.swing.JFrame implements Observer
     private void agregarApp() {
         String appname = JOptionPane.showInputDialog(this, "Nombre de la aplicación", "Ingrese el nombre de la aplicación a agregar", JOptionPane.INFORMATION_MESSAGE);
         String apppath = JOptionPane.showInputDialog(this, "Ruta local de la aplicación", "Ingrese la ruta donde se encuentra la aplicación", JOptionPane.INFORMATION_MESSAGE);
+        String appinst = JOptionPane.showInputDialog(this, "Instrucciones de la Aplicación", "Ingrese las instrucciones para el funcionamiento de la aplicación", JOptionPane.INFORMATION_MESSAGE);
+        int appnumpar = Integer.parseInt(JOptionPane.showInputDialog(this, "número de parámetros", "Ingrese el número de parámetros de la aplicación", JOptionPane.INFORMATION_MESSAGE));
         if (appname != null && !appname.equals("") && apppath != null && !apppath.equals("")) {
+
             try {
-                mundo.agregarAplicacion(appname, apppath);
+                mundo.agregarAplicacion(appname, apppath, appinst, appnumpar);
 
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Error agregando la aplicación", "Error", JOptionPane.ERROR_MESSAGE);

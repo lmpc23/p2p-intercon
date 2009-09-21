@@ -15,11 +15,17 @@ public class Aplicacion implements IAplicacion{
 
     public String ruta;
 
+    public String instrucciones;
 
-    public Aplicacion(String n, String r)
+    public int numParametros;
+
+
+    public Aplicacion(String n, String r, String ins, int npar)
     {
         nombre=n;
         ruta = r;
+        instrucciones=ins;
+        numParametros = npar;
     }
 
     public String darNombre() {
@@ -41,6 +47,14 @@ public class Aplicacion implements IAplicacion{
     public String toString()
     {
         return nombre;
+    }
+
+    public String darInstrucciones() {
+       return instrucciones;
+    }
+
+    public int darNumeroParámetros() {
+        return numParametros;
     }
 
 }

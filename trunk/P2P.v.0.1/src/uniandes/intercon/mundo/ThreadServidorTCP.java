@@ -24,6 +24,13 @@ public class ThreadServidorTCP extends Thread{
 
     ServerSocket servidor;
 
+    P2P principal;
+
+    public ThreadServidorTCP(P2P p)
+    {
+        principal=p;
+    }
+
    public void run()
    {
         try {
@@ -34,10 +41,6 @@ public class ThreadServidorTCP extends Thread{
         } catch (Exception ex) {
 
         }
-        
-
-
-
    }
 
     private void procesarSolicitudes() throws Exception {
@@ -49,8 +52,30 @@ public class ThreadServidorTCP extends Thread{
            BufferedReader in = new BufferedReader(new InputStreamReader ( cliente.getInputStream()));
            DataOutputStream out = new DataOutputStream(cliente.getOutputStream());
 
-           String aplicacion = in.readLine();
-           out.writeBytes("Mensaje");
+           String msj = in.readLine();
+           String[] val = msj.split(":");
+           if(val[0].equals("APLICACION_LIN"))
+           {
+                IAplicacion a = principal.darAplicacion(val[1]);
+                out.writeBytes(a.darInstrucciones());
+           }
+           else if(val[0].equals("APLICACION_NUMPAR"))
+           {
+                IAplicacion a = principal.darAplicacion(val[1]);
+                out.writeBytes(String.valueOf(a.darNumeroParámetros()));
+           }
+           else if(val[0].equals("APLICACION_PARAMS"))
+           {
+                String[] params = new String[val.length-2];
+                for(int i=0; i<params.length; i++)
+                {
+                    params[i]=val[2+0];
+                }
+
+                String res = principal.ejecutar(val[1], params);
+                out.writeBytes(res);
+           }
+
 
 
         }
