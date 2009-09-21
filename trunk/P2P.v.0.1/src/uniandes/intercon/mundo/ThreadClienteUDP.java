@@ -52,7 +52,7 @@ public class ThreadClienteUDP extends Thread {
     public void handshakingAns(String login, String ip, ArrayList<IAplicacion> aplicaciones) throws Exception
     {
         this.sleep(1000);
-        String saludo = "HOLA_ANS:"+login+":"+ip+":"+aplicaciones.size();
+        String saludo = "HOLA_ANS:"+login+":"+ip+":"+aplicaciones.size()+":";
         for(int i=0; i<aplicaciones.size(); i++)
         {
             saludo+=aplicaciones.get(i).darNombre();

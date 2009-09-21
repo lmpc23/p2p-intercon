@@ -265,10 +265,11 @@ public class P2P
             ArrayList<String> apls = c.darListaAplicaciones();
             for(int j=0; j<apls.size(); j++)
             {
-                String a = apls.get(i);
+                String a = apls.get(j);
                 if(a.equals(ap))
                 {
                     tcp = new ThreadClienteTCP(c.darIP(), a, this);
+                    System.out.println(tcp);
                     tcp.start();
                     return tcp.darLineamientos();
                  }
