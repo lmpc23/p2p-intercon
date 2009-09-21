@@ -24,8 +24,7 @@ import uniandes.intercon.mundo.P2P;
  *
  * @author Julian
  */
-public class InterfazP2P extends javax.swing.JFrame implements Observer
-{
+public class InterfazP2P extends javax.swing.JFrame implements Observer {
 
     private P2P mundo;
     private Noticia noticia;
@@ -35,8 +34,7 @@ public class InterfazP2P extends javax.swing.JFrame implements Observer
         boolean logged = false;
         while (!logged) {
             String login = JOptionPane.showInputDialog(this, "Ingrese su login", "Login", JOptionPane.INFORMATION_MESSAGE);
-            if (login != null && !login.equals(""))
-            {
+            if (login != null && !login.equals("")) {
                 noticia = new Noticia();
                 mundo = new P2P(login, noticia);
                 if (mundo.numApps() == 0) {
@@ -54,13 +52,13 @@ public class InterfazP2P extends javax.swing.JFrame implements Observer
                         }
                     }
                 }
-                
+
                 initComponents();
                 noticia.addObserver(this);
                 jList1.setListData(mundo.getListaRemota().toArray());
-                
-                
-                
+
+
+
                 logged = true;
             } else {
                 JOptionPane.showMessageDialog(this, "Por favor ingrese un login válido", "Error", JOptionPane.ERROR_MESSAGE);
@@ -70,21 +68,18 @@ public class InterfazP2P extends javax.swing.JFrame implements Observer
     }
 
     private void ejecutar(String ap) {
-        try{
-       String linea=mundo.recibirLineamientos(ap);
-       int nPar = Integer.parseInt(mundo.darNumeroParametros());
-       String[] params = new String[nPar];
-       JOptionPane.showMessageDialog(this, "Instrucciones", linea, JOptionPane.INFORMATION_MESSAGE);
-       for(int i =0; i < params.length; i++)
-       {
-            params[i]=JOptionPane.showInputDialog(this, "Entradas", "Ingrese Parámetro "+i, JOptionPane.INFORMATION_MESSAGE);
-       }
-       String res = mundo.darResultados(params);
-       JOptionPane.showMessageDialog(this, "Resultado", res, JOptionPane.INFORMATION_MESSAGE);
+        try {
+            String linea = mundo.recibirLineamientos(ap);
+            int nPar = Integer.parseInt(mundo.darNumeroParametros());
+            String[] params = new String[nPar];
+            JOptionPane.showMessageDialog(this, "Instrucciones", linea, JOptionPane.INFORMATION_MESSAGE);
+            for (int i = 0; i < params.length; i++) {
+                params[i] = JOptionPane.showInputDialog(this, "Entradas", "Ingrese Parámetro " + i, JOptionPane.INFORMATION_MESSAGE);
+            }
+            String res = mundo.darResultados(params);
+            JOptionPane.showMessageDialog(this, "Resultado", res, JOptionPane.INFORMATION_MESSAGE);
 
-        }
-        catch(Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -345,13 +340,10 @@ public class InterfazP2P extends javax.swing.JFrame implements Observer
     private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
         String ur1 = (String) jList1.getSelectedValue().toString();
         System.out.println(ur1);
-        try
-        {
-            String ur2 = ur1.substring(0,ur1.lastIndexOf(":"));
+        try {
+            String ur2 = ur1.substring(0, ur1.lastIndexOf(":"));
             jList2.setListData(mundo.getListaArchivosURemoto(ur2).toArray());
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }//GEN-LAST:event_jList1ValueChanged
@@ -404,20 +396,19 @@ public class InterfazP2P extends javax.swing.JFrame implements Observer
 
     }
 
-    public void update(Observable o, Object arg)
-    {
-        String news = ( String )arg;
-        if(news.startsWith("REMOTO"))
-        {
+    public void update(Observable o, Object arg) {
+        String news = (String) arg;
+        String news2 = news;
+        if (news.startsWith("REMOTO")) {
             jList1.setListData(mundo.getListaRemota().toArray());
-            
+            news2 = news.substring(6);
+
         }
-        String news2 = news.substring(6);
+
         Date hoy = new Date(System.currentTimeMillis());
-        jTextArea1.setText( "["+hoy.toString()+"] "+ news2 +"\n"+jTextArea1.getText() );
-        
+        jTextArea1.setText("[" + hoy.toString() + "] " + news2 + "\n" + jTextArea1.getText());
+
     }
-    
 
     /**
      * @param args the command line arguments
@@ -452,6 +443,4 @@ public class InterfazP2P extends javax.swing.JFrame implements Observer
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
-
-
 }
