@@ -17,6 +17,10 @@ public interface IAplicacion {
 
     public String darRuta();
 
+    public String darInstrucciones();
+
+    public int darNumeroParámetros();
+
     @Override
     public String toString();
 

@@ -26,11 +26,18 @@ public class P2P
     /**
      * Thread del Servidor vía UDP
      */
-    ThreadServidorUDP ts;
+    private ThreadServidorUDP ts;
     /**
      * Thread del Cliente vía UDP
      */
-    ThreadClienteUDP tc;
+    private ThreadClienteUDP tc;
+    
+    private ThreadServidorTCP tsp;
+    /**
+     * Thread del Cliente vía UDP
+     */
+    private ThreadClienteTCP tcp;
+
     private Noticia noticia;
 
 
@@ -55,6 +62,8 @@ public class P2P
             ts.start();
             tc = new ThreadClienteUDP();
             tc.start();
+            tsp = new ThreadServidorTCP(this);
+            tsp.start();
 
             //Handshaking para la red P2P
             tc.handshaking(login, ip, listaAplicacionesLocales);
@@ -155,9 +164,9 @@ public class P2P
      * @param ruta
      * @throws java.lang.Exception
      */
-    public void agregarAplicacion(String ap, String ruta) throws Exception {
+    public void agregarAplicacion(String ap, String ruta, String ins, int npar) throws Exception {
         //código nueva Aplicacion
-        listaAplicacionesLocales.add(new Aplicacion(ap, ruta));
+        listaAplicacionesLocales.add(new Aplicacion(ap, ruta, ins, npar));
         tc.agregarAplicacion(login, ip, ap);
     }
 
@@ -248,6 +257,38 @@ public class P2P
         return listaAplicacionesLocales;
     }
 
+    public String recibirLineamientos(String ap) throws Exception
+    {
+        for(int i=0; i<listaClientesDisponibles.size(); i++)
+        {
+            IClienteRemoto c= listaClientesDisponibles.get(i);
+            ArrayList<String> apls = c.darListaAplicaciones();
+            for(int j=0; j<apls.size(); j++)
+            {
+                String a = apls.get(i);
+                if(a.equals(ap))
+                {
+                    tcp = new ThreadClienteTCP(c.darIP(), a, this);
+                    tcp.start();
+                    return tcp.darLineamientos();
+                 }
+            }
+
+        }
+        return null;
+ 
+    }
+
+    public String darNumeroParametros() throws Exception
+    {
+        return tcp.darNumeroParametros();
+    }
+
+    public String darResultados(String[] params) throws Exception
+    {
+        return tcp.darRespuesta(params);
+    }
+
     public ArrayList getListaRemota()
     {
         return listaClientesDisponibles;
@@ -266,6 +307,19 @@ public class P2P
 
         throw new Exception("Error localizando al usuario remoto");
 
+    }
+
+    
+
+    public IAplicacion darAplicacion(String ap)
+    {
+        for(int i=0; i<listaAplicacionesLocales.size(); i++)
+        {
+            IAplicacion a = listaAplicacionesLocales.get(i);
+            if(a.darNombre().equals(ap))
+                return a;
+        }
+        return null;
     }
 
     /*
